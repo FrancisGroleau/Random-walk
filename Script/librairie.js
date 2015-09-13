@@ -9,6 +9,8 @@ var canvas,
 	var NumberOfRow, NumberOfCol;
 	var index = 0;
 	var pathDone = false;
+	var directionFrequency = [0, 0, 0, 0];
+
 
 
 window.onload = function(){
@@ -76,22 +78,23 @@ function getPath(){
 function createPath(){
  	
 
-	 var indexesOfCellsInLastCol = new Array();
-	 for(var o = NumberOfRow; o < (NumberOfRow * NumberOfRow); o+= NumberOfRow)
-		 indexesOfCellsInLastCol.push(o);
+	    var indexesOfCellsInLastCol = new Array();
+	    for(var o = NumberOfRow; o < (NumberOfRow * NumberOfRow); o+= NumberOfRow)
+		    indexesOfCellsInLastCol.push(o);
 
-	 var indexesOfCellsInFirstCol = new Array();
-	 for(var k = 1; k < (NumberOfRow * NumberOfRow); k+= NumberOfRow)
-		 indexesOfCellsInFirstCol.push(k);
+	    var indexesOfCellsInFirstCol = new Array();
+	    for(var k = 1; k < (NumberOfRow * NumberOfRow); k+= NumberOfRow)
+		    indexesOfCellsInFirstCol.push(k);
 		
-	 var usedDirection = [];
+	    var usedDirection = [];
 		
-	 var x = 2;
-	 var y = 2;
+	    var x = 2;
+	    var y = 2;
 	 
-	 // random walk without crossing
-	 for(var i = 0; i < 5000; i++){
-		var direction = Math.floor((Math.random()*4));
+	    // random walk without crossing
+	    for(var i = 0; i < 5000; i++){
+	        var direction = Math.floor((Math.random() * 4));
+	        directionFrequency[direction]++;
 		
 			//always start the same way
 		if(i < 10){
@@ -105,6 +108,11 @@ function createPath(){
 		}	
 		else
 		{
+		    var lowerFrequency = getLowerFrequency();
+		    if (direction == lowerFrequency) {
+		        direction = getAlternateDirection();
+		    }
+
 			switch(direction){
 					//left
 					case 0: 
@@ -253,7 +261,7 @@ function cell(x, y, width, height, borderColor, color, isPath){
 }
 
 function contains(array, obj){
-		 for (var i = 0; i < array.length; i++) {
+		    for (var i = 0; i < array.length; i++) {
         if (array[i] == obj  ) {
             return true;
         }
@@ -265,13 +273,48 @@ function contains(array, obj){
 
 
 function intersect(rectA, rectB) {
-  return !(rectA.x + rectA.width < rectB.x ||
-           rectB.x + rectB.width < rectA.x ||
-           rectA.y + rectA.height < rectB.y ||
-           rectB.y + rectB.height < rectA.y);
-}; 
+    return !(rectA.x + rectA.width < rectB.x ||
+            rectB.x + rectB.width < rectA.x ||
+            rectA.y + rectA.height < rectB.y ||
+            rectB.y + rectB.height < rectA.y);
+};
 
+function getHigherFrequency() {
+    var higherFrequency = -1;
+    var higerFrequencyValue = -1;
+    for (var i = 0; i < 4; i++) {
+        if (directionFrequency[i] > higerFrequencyValue) {
+            higherFrequency = i;
+            higerFrequencyValue = directionFrequency[i];
+        }
+    }
+    return higherFrequency;
+};
 
+function getLowerFrequency() {
+    var lowerFrequency = 4;
+    var lowerFrequencyValue = 1000000;
+    for (var i = 0; i < 4; i++) {
+        if (directionFrequency[i] < lowerFrequencyValue) {
+            lowerFrequency = i;
+            lowerFrequencyValue = directionFrequency[i];
+        }
+    }
+    return lowerFrequency;
+};
+
+function getAlternateDirection(actualDirection) {
+    switch (actualDirection) {
+        case 0:
+            return 1;
+        case 1:
+            return 2;
+        case 2:
+            return 3;
+        case 3:
+            return 0;
+    }
+};
 	
 
 
