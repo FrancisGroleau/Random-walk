@@ -90,7 +90,7 @@ function createPath(){
 	 var y = 2;
 	 
 	 // random walk without crossing
-	 for(var i = 0; i < 50000; i++){
+	 for(var i = 0; i < 5000; i++){
 		var direction = Math.floor((Math.random()*4));
 		
 			//always start the same way
@@ -226,10 +226,7 @@ function cell(x, y, width, height, borderColor, color, isPath){
 	this.id = cellsIndex;
 	cellsIndex++;
 
-	if(this.tower != null && this.isHover)
-		this.tower.isHover = true;
-	
-	
+
 	
 	this.draw = function(){
 		if(this.isPath){	
@@ -268,14 +265,6 @@ function contains(array, obj){
 
 }
 
-function getMousePos(canvas, evt) {
-
-    var rect = canvas.getBoundingClientRect();
-    return {
-        x: evt.clientX - rect.left,
-        y: evt.clientY - rect.top
-    };
-}
 
 
 function intersect(rectA, rectB) {
@@ -285,13 +274,7 @@ function intersect(rectA, rectB) {
            rectB.y + rectB.height < rectA.y);
 }; 
 
-//game loop
-function drawPath(){
-	//first draw the cell
-	for( var ce in cells){	
-		cells[ce].draw();
-	}
-}
+
 	
 
 
