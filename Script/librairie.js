@@ -215,10 +215,7 @@ function cell(x, y, width, height, borderColor, color, isPath){
 	this.borderColor = borderColor;
 	this.color = color;
 	this.isPath = isPath;
-	this.tower = null;
-	this.isHover = false;
-	this.isBase = false;
-	this.leftArrow = false;
+
 	
 	//manage cells
 
