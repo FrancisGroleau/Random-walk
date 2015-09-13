@@ -1,7 +1,7 @@
 var canvas,
 	cells = [],
-	cellWidth = 5,
-	cellHeight = 5;
+	cellWidth = 10,
+	cellHeight = 10;
 	var grid = [];
 	var NumberOfRow, NumberOfCol;
 	var index = 0;
@@ -48,14 +48,20 @@ function initializeCanvas(){
 
 function clearGrid(){
 
-	cells = [];
 	tries = [];
-	directionFrequency = [0, 0, 0, 0];
+	
 	
 	c.clearRect (0 , 0 , canvas.width, canvas.height);
 	c.fillStyle = "black";
 	c.fillRect(0,0,canvas.width,canvas.height);
 
+	
+	createEmptyGrid();
+	drawCells();
+}
+
+function createEmptyGrid(){
+	cells = [];
 	grid = [];
 	grid = new Array(NumberOfRow)
 	for(var j = 0; j < NumberOfCol; j++)
@@ -66,11 +72,8 @@ function clearGrid(){
 			var tmpCell = cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'black', false);
 			cells.push(tmpCell);
 			grid[row][col] = tmpCell;
-			
 		}
 	} 
-
-	drawCells();
 }
 
 function emptyGrid(){
@@ -78,19 +81,8 @@ function emptyGrid(){
 	cells = [];
 	grid = [];
 	directionFrequency = [0, 0, 0, 0];
+	createEmptyGrid();
 	
-	grid = new Array(NumberOfRow)
-	for(var j = 0; j < NumberOfCol; j++)
-		grid[j] = new Array(NumberOfRow);
-		
-	for(var row = 0; row < NumberOfRow; row++){
-		for(var col = 0; col < NumberOfCol; col++){
-			var tmpCell = cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'black', false);
-			grid[row][col] = tmpCell;
-			cells.push(tmpCell);
-		}
-	}
-
 	drawCells();
 
 }
@@ -115,20 +107,6 @@ function regenerate(){
 		}
 	
 	}
-	
-	/*
-	for( var t in tries){
-		var cellsForCurrentTry = tries[t];
-		for( var ce in cellsForCurrentTry){
-			cellsForCurrentTry[ce].isNotCurrentGeneration = true;
-			cellsForCurrentTry[ce].draw();
-		}
-	
-	}
-	
-	*/
-	
-	
 }
 
 function drawCells(){
@@ -140,7 +118,6 @@ function drawCells(){
 
 function createPath(){
  	
-
 	var indexesOfCellsInLastCol = new Array();
 	for(var o = NumberOfRow; o < (NumberOfRow * NumberOfRow); o+= NumberOfRow)
 		indexesOfCellsInLastCol.push(o);
@@ -241,6 +218,7 @@ function createPath(){
 
 }
 
+
 function collideDirection(y, x){
 
 	var numberOfCollidingCells = 0;
@@ -264,56 +242,6 @@ function collideDirection(y, x){
 }
 
 
-
-function cell(x, y, width, height, borderColor, color, isPath){
-	var self = {
-		x : x,
-		y : y,
-		width : width,
-		height : height,
-		borderColor : borderColor,
-		color : color,
-		isPath : isPath,
-		isNotCurrentGeneration : false,
-
-		
-		
-		draw : function(){
-			if(self.isPath){	
-				c.beginPath();
-					c.lineWidth="1";
-					c.strokeStyle = self.isNotCurrentGeneration ? "#B8B8B8" : "black"
-					c.rect(self.x,self.y,self.width,self.height);
-				c.stroke(); 
-			
-				if(self.isNotCurrentGeneration){
-					c.fillStyle = "black";
-					c.fillRect(self.x,self.y,self.width,self.height);
-					c.fillStyle = "rgba(255, 255, 0, 0.50)"; //yellow
-					c.fillRect(self.x,self.y,self.width,self.height);
-				}else{
-					c.fillStyle = "yellow"; //yellow
-					c.fillRect(self.x,self.y,self.width,self.height);
-				}			
-			}else{
-				//Draw the normal cell
-				c.beginPath();
-					c.lineWidth="1";
-					c.strokeStyle = self.borderColor;
-					c.rect(self.x,self.y,self.width,self.height);
-				c.stroke(); 
-				
-				c.fillStyle = self.color;
-				c.fillRect(self.x,self.y,self.width,self.height);
-			}
-			
-		}
-
-	}
-	
-	return self;
-}
-
 function contains(array, obj){
 		 for (var i = 0; i < array.length; i++) {
         if (array[i] == obj  ) {
@@ -323,9 +251,6 @@ function contains(array, obj){
     return false;
 
 }
-
-
-
 
 function getHigherFrequency() {
     var higherFrequency = -1;
@@ -364,6 +289,56 @@ function getAlternateDirection(actualDirection) {
     }
 };
 
+
+
+function cell(x, y, width, height, borderColor, color, isPath){
+	var self = {
+		x : x,
+		y : y,
+		width : width,
+		height : height,
+		borderColor : borderColor,
+		color : color,
+		isPath : isPath,
+		isNotCurrentGeneration : false,
+
+		
+		
+		draw : function(){
+			if(self.isPath){	
+				c.beginPath();
+					c.lineWidth="1";
+					c.strokeStyle = self.isNotCurrentGeneration ? "#B8B8B8" : "black"
+					c.rect(self.x,self.y,self.width,self.height);
+				c.stroke(); 
+			
+				if(self.isNotCurrentGeneration){
+					//c.fillStyle = "black";
+					//c.fillRect(self.x,self.y,self.width,self.height);
+					c.fillStyle = "rgba(255, 255, 0, 0.50)"; //pale yellow
+					c.fillRect(self.x,self.y,self.width,self.height);
+				}else{
+					c.fillStyle = "yellow"; //yellow
+					c.fillRect(self.x,self.y,self.width,self.height);
+				}			
+			}else{
+				//Draw the normal cell
+				c.beginPath();
+					c.lineWidth="1";
+					c.strokeStyle = self.borderColor;
+					c.rect(self.x,self.y,self.width,self.height);
+				c.stroke(); 
+				
+				c.fillStyle = self.color;
+				c.fillRect(self.x,self.y,self.width,self.height);
+			}
+			
+		}
+
+	}
+	
+	return self;
+}
 
 	
 
