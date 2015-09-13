@@ -16,7 +16,6 @@ window.onload = function(){
 		canvas.width = 800;
 		canvas.height =  800;
 			
-		
 		initializeCanvas();	
 }
 
@@ -44,21 +43,20 @@ function initializeCanvas(){
 	} 
 
 	createPath();
-	
-	//draw them cells
-	drawCells();
-	
+	drawCells();	
 }
 
 function clearGrid(){
 
 	cells = [];
 	tries = [];
+	directionFrequency = [0, 0, 0, 0];
 	
 	c.clearRect (0 , 0 , canvas.width, canvas.height);
 	c.fillStyle = "black";
 	c.fillRect(0,0,canvas.width,canvas.height);
 
+	grid = [];
 	grid = new Array(NumberOfRow)
 	for(var j = 0; j < NumberOfCol; j++)
 		grid[j] = new Array(NumberOfRow);
@@ -79,6 +77,7 @@ function emptyGrid(){
 	
 	cells = [];
 	grid = [];
+	directionFrequency = [0, 0, 0, 0];
 	
 	grid = new Array(NumberOfRow)
 	for(var j = 0; j < NumberOfCol; j++)
