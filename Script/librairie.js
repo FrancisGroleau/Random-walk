@@ -1,17 +1,13 @@
 var canvas,
-	cellsIndex = 0,
-	cells = {},
+	cells = [],
 	cellWidth = 5,
-	cellHeight = 5,
-	path = {},
-	pathIndex = 0;
+	cellHeight = 5;
 	var grid = [];
 	var NumberOfRow, NumberOfCol;
 	var index = 0;
 	var pathDone = false;
+	var tries = [];
 	var directionFrequency = [0, 0, 0, 0];
-
-
 
 window.onload = function(){
 
@@ -20,17 +16,13 @@ window.onload = function(){
 		canvas.width = 800;
 		canvas.height =  800;
 			
-
-		c.fillStyle = "rgba(0,0,0,0.2)";
-		c.fillRect(0,0,canvas.width,canvas.height);
 		
-		initializeCanvas();
-		
+		initializeCanvas();	
 }
 
 function initializeCanvas(){
 
-	c.fillStyle = "rgba(0,0,0,0.2)";
+	c.fillStyle = "black";
 	c.fillRect(0,0,canvas.width,canvas.height);
 	
 	NumberOfRow = (canvas.width / cellWidth);
@@ -44,75 +36,146 @@ function initializeCanvas(){
 	//create the cells
 	for(var row = 0; row < NumberOfRow; row++){
 		for(var col = 0; col < NumberOfCol; col++){
-			grid[row][col] = new cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'rgba(0,0,0,0.2)', false);
+			var tmpCell = cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'black', false);
+			cells.push(tmpCell);
+			grid[row][col] = tmpCell;
+			
 		}
 	} 
 
 	createPath();
-	//getPath;
-
+	
 	//draw them cells
-	for( var ce in cells){	
-		cells[ce].draw();
-	}
+	drawCells();
 	
-	
-
 }
 
-function getPath(){
+function clearGrid(){
 
+	cells = [];
+	tries = [];
+	
+	c.clearRect (0 , 0 , canvas.width, canvas.height);
+	c.fillStyle = "black";
+	c.fillRect(0,0,canvas.width,canvas.height);
+
+	grid = new Array(NumberOfRow)
+	for(var j = 0; j < NumberOfCol; j++)
+		grid[j] = new Array(NumberOfRow);
+		
 	for(var row = 0; row < NumberOfRow; row++){
 		for(var col = 0; col < NumberOfCol; col++){
-			var selectedCell = grid[row][col];
-			if(selectedCell.isPath){
-				path[pathIndex] = selectedCell;	
-				pathIndex++;				
-			}
+			var tmpCell = cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'black', false);
+			cells.push(tmpCell);
+			grid[row][col] = tmpCell;
+			
+		}
+	} 
+
+	drawCells();
+}
+
+function emptyGrid(){
+	
+	cells = [];
+	grid = [];
+	
+	grid = new Array(NumberOfRow)
+	for(var j = 0; j < NumberOfCol; j++)
+		grid[j] = new Array(NumberOfRow);
+		
+	for(var row = 0; row < NumberOfRow; row++){
+		for(var col = 0; col < NumberOfCol; col++){
+			var tmpCell = cell((row * cellWidth),(col * cellHeight),cellWidth,cellHeight, '#B8B8B8', 'black', false);
+			grid[row][col] = tmpCell;
+			cells.push(tmpCell);
 		}
 	}
 
+	drawCells();
 
 }
+
+function regenerate(){
+	
+	tries.push(cells);
+	
+	
+	emptyGrid();
+	createPath();
+
+	drawCells();
+	
+
+	
+	for(var i = 0; i < tries.length; i++){
+		var cellsForCurrentTry = tries[i];
+		for( var j = 0; j < cellsForCurrentTry.length; j++){
+			cellsForCurrentTry[j].isNotCurrentGeneration = true;
+			cellsForCurrentTry[j].draw();
+		}
+	
+	}
+	
+	/*
+	for( var t in tries){
+		var cellsForCurrentTry = tries[t];
+		for( var ce in cellsForCurrentTry){
+			cellsForCurrentTry[ce].isNotCurrentGeneration = true;
+			cellsForCurrentTry[ce].draw();
+		}
+	
+	}
+	
+	*/
+	
+	
+}
+
+function drawCells(){
+	for( var i =0; i < cells.length; i++){
+		cells[i].draw();
+	}
+}
+
 
 function createPath(){
  	
 
-	    var indexesOfCellsInLastCol = new Array();
-	    for(var o = NumberOfRow; o < (NumberOfRow * NumberOfRow); o+= NumberOfRow)
-		    indexesOfCellsInLastCol.push(o);
+	var indexesOfCellsInLastCol = new Array();
+	for(var o = NumberOfRow; o < (NumberOfRow * NumberOfRow); o+= NumberOfRow)
+		indexesOfCellsInLastCol.push(o);
 
-	    var indexesOfCellsInFirstCol = new Array();
-	    for(var k = 1; k < (NumberOfRow * NumberOfRow); k+= NumberOfRow)
-		    indexesOfCellsInFirstCol.push(k);
+	var indexesOfCellsInFirstCol = new Array();
+	for(var k = 1; k < (NumberOfRow * NumberOfRow); k+= NumberOfRow)
+		indexesOfCellsInFirstCol.push(k);
 		
-	    var usedDirection = [];
+	var usedDirection = [];
 		
-	    var x = 2;
-	    var y = 2;
+	var x = 0;
+	var y = 0;
 	 
-	    // random walk without crossing
-	    for(var i = 0; i < 5000; i++){
-	        var direction = Math.floor((Math.random() * 4));
-	        directionFrequency[direction]++;
+	 // random walk without crossing
+	for(var i = 0; i < 5000; i++){
+		var direction = Math.floor((Math.random()*4));
+		directionFrequency[direction]++;
 		
 			//always start the same way
-		if(i < 10){
-			if(i == 9){
+		if(i < 4){
+			if(i == 3){
 				grid[2][i].isPath = true;
 				grid[1][i].isPath = true;
 				x = i;
 				y = 2;
 			}
 			grid[0][i].isPath = true;
-		}	
-		else
-		{
-		    var lowerFrequency = getLowerFrequency();
+		}else{
+		
+			var lowerFrequency = getLowerFrequency();
 		    if (direction == lowerFrequency) {
 		        direction = getAlternateDirection();
 		    }
-
+		
 			switch(direction){
 					//left
 					case 0: 
@@ -162,7 +225,7 @@ function createPath(){
 					//down
 					case 3:
 						if(!contains(usedDirection, 3)){
-							if(collideDirection(y + 1,x) == 1 && collideDirection(y + 2,x) == 0 ){
+							if(collideDirection(y + 1,x) == 1 && collideDirection(y + 2,x) == 0){
 								if((y + 1 < (NumberOfRow - 1)) && !grid[y + 1][x].isPath){
 									grid[y + 1][x].isPath = true;
 									y++;
@@ -173,9 +236,9 @@ function createPath(){
 							}	
 						}					
 					break;
-				}
 			}
 		}
+	}
 
 }
 
@@ -201,67 +264,59 @@ function collideDirection(y, x){
 		return 0;
 }
 
-function clear(x,y,width,height){
 
-	// Store the current transformation matrix
-	c.save();
-
-	// Use the identity matrix while clearing the canvas
-	c.setTransform(1, 0, 0, 1, 0, 0);
-	c.clearRect ( x , y , width , height );
-
-	// Restore the transform
-	c.restore();
-	
-}
 
 function cell(x, y, width, height, borderColor, color, isPath){
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.borderColor = borderColor;
-	this.color = color;
-	this.isPath = isPath;
+	var self = {
+		x : x,
+		y : y,
+		width : width,
+		height : height,
+		borderColor : borderColor,
+		color : color,
+		isPath : isPath,
+		isNotCurrentGeneration : false,
 
-	
-	//manage cells
-
-	cells[cellsIndex] = this;		
-	this.id = cellsIndex;
-	cellsIndex++;
-
-
-	
-	this.draw = function(){
-		if(this.isPath){	
 		
-			c.beginPath();
-				c.lineWidth="1";
-				c.strokeStyle= "black";//"rgba(255, 255, 0, 0.30)";
-				c.rect(this.x,this.y,this.width,this.height);
-			c.stroke(); 
 		
-			c.fillStyle = "yellow";
-			c.fillRect(this.x,this.y,this.width,this.height);	
-		}else{
-			//Draw the normal cell
-			c.beginPath();
-				c.lineWidth="1";
-				c.strokeStyle= this.borderColor;
-				c.rect(this.x,this.y,this.width,this.height);
-			c.stroke(); 
+		draw : function(){
+			if(self.isPath){	
+				c.beginPath();
+					c.lineWidth="1";
+					c.strokeStyle = self.isNotCurrentGeneration ? "#B8B8B8" : "black"
+					c.rect(self.x,self.y,self.width,self.height);
+				c.stroke(); 
 			
-			c.fillStyle = "black";
-			c.fillRect(this.x,this.y,this.width,this.height);
+				if(self.isNotCurrentGeneration){
+					c.fillStyle = "black";
+					c.fillRect(self.x,self.y,self.width,self.height);
+					c.fillStyle = "rgba(255, 255, 0, 0.50)"; //yellow
+					c.fillRect(self.x,self.y,self.width,self.height);
+				}else{
+					c.fillStyle = "yellow"; //yellow
+					c.fillRect(self.x,self.y,self.width,self.height);
+				}			
+			}else{
+				//Draw the normal cell
+				c.beginPath();
+					c.lineWidth="1";
+					c.strokeStyle = self.borderColor;
+					c.rect(self.x,self.y,self.width,self.height);
+				c.stroke(); 
+				
+				c.fillStyle = self.color;
+				c.fillRect(self.x,self.y,self.width,self.height);
+			}
+			
 		}
-		
-	}
 
+	}
+	
+	return self;
 }
 
 function contains(array, obj){
-		    for (var i = 0; i < array.length; i++) {
+		 for (var i = 0; i < array.length; i++) {
         if (array[i] == obj  ) {
             return true;
         }
@@ -272,12 +327,6 @@ function contains(array, obj){
 
 
 
-function intersect(rectA, rectB) {
-    return !(rectA.x + rectA.width < rectB.x ||
-            rectB.x + rectB.width < rectA.x ||
-            rectA.y + rectA.height < rectB.y ||
-            rectB.y + rectB.height < rectA.y);
-};
 
 function getHigherFrequency() {
     var higherFrequency = -1;
@@ -315,6 +364,8 @@ function getAlternateDirection(actualDirection) {
             return 0;
     }
 };
+
+
 	
 
 
